@@ -1,69 +1,77 @@
 # Personal Expense Tracker
 
-## 1. Project description
+## Project description
 
-Personal Expense Tracker is a beginner-friendly command-line program for recording income and expenses, reviewing a budget, and seeing simple spending summaries. Transactions are kept in a CSV file so they are still available after the program closes.
+Personal Expense Tracker is a local desktop app for recording income and expenses, checking a running balance, and reviewing spending by category and month. The interface is built with Tkinter, while transactions remain in a simple CSV file.
 
-## 2. Features
+## Features
 
-- Add income with a source, description, amount, and date.
-- Add expenses with a category, description, amount, and date.
-- View the transaction list and overall balance.
-- See expense totals by category and the highest-spending category.
-- See monthly income, expenses, and balance in a Pandas table.
-- Create category and monthly expense charts in the `charts` folder.
-- Validate entered amounts and dates.
+- Dashboard cards show total income, expenses, current balance, and transaction count.
+- Add income or expense with amount, source/category, description, and date.
+- Validate positive amounts, required text, and real dates in `DD-MM-YYYY` format.
+- View transaction history with income and expense amounts highlighted in different colors.
+- Review the highest-spending category and monthly income, expense, and balance totals.
+- View category and monthly income/expense charts that refresh when a transaction is added.
+- Keep data between runs in `expenses.csv`.
+- Save chart images in the `charts` folder.
 
-## 3. Technologies used
+## Technologies used
 
 - Python 3
-- CSV file handling
-- `datetime` for date validation and month grouping
-- Pandas for the monthly summary and chart data
-- Matplotlib for charts
-- Lists and dictionaries for transaction data and category totals
+- Tkinter and `ttk` for the desktop interface (included with most Python installations on Windows)
+- CSV and `datetime` for saving transactions and validating dates
+- Pandas for monthly analysis
+- Matplotlib for embedded charts and saved PNG charts
+- Lists and dictionaries for transaction records and category totals
 
-## 4. Project structure
+## Installation requirements
 
-```text
-PersonalExpenseTracker/
-├── main.py
-├── expenses.csv
-├── README.md
-└── charts/                 # Created when charts are generated
-```
-
-## 5. Install dependencies
-
-Install Python 3 if it is not already available, then install the two Python packages used by the reports and charts:
+Use Python 3.10 or newer. Install the third-party packages from a terminal in this folder:
 
 ```bash
-pip install pandas matplotlib
+pip install -r requirements.txt
 ```
 
-## 6. Run the project
+This installs Pandas and Matplotlib. Tkinter normally comes with the Windows Python installer; if `import tkinter` fails, rerun the Python installer and enable the Tcl/Tk option.
 
-Open a terminal in this folder and run:
+## How to run
+
+In the VS Code terminal, open this project folder and run:
 
 ```bash
 python main.py
 ```
 
-The program loads `expenses.csv` on startup. New transactions are appended to that file immediately. An empty CSV is normal; the project starts without sample transactions.
+This opens the dashboard window. The original command-line menu is still available by running `python -c "import main; main.cli_main()"`.
 
-## 7. Example usage
+## Basic usage
 
-Choose `1` to add income. For example, enter an amount of `25000`, a source of `Salary`, a description such as `Monthly salary`, and a date such as `25-11-2026`.
+1. Select **Income** or **Expense** in the Add transaction form.
+2. Enter an amount greater than zero, a source/category, a description, and a valid date such as `25-11-2026`.
+3. Select **Add transaction**. The new record is appended to `expenses.csv` and the dashboard refreshes.
+4. Use the sidebar to jump to the dashboard, form, transaction list, or analytics.
 
-Choose `2` to add an expense, such as `500` in the `Food` category with the description `Lunch`. Dates must use `DD-MM-YYYY`. Use the menu to view transactions, balance, summaries, or generate charts. Chart files are saved as `charts/category_expenses.png` and `charts/monthly_expenses.png`.
+An income source is saved in the CSV `category` column, such as `Salary`. Expense categories can be selected from the suggested list. The CSV starts empty except for its column headings; the app does not insert example transactions.
 
-## 8. Python concepts demonstrated
+## Project structure
 
-The program demonstrates variables, input and output, `if`/`elif`/`else`, loops, functions, lists, dictionaries, exception handling, CSV reading and writing, and date handling with `datetime`. Pandas creates a DataFrame and groups data by month. Matplotlib draws and saves charts.
+```text
+PersonalExpenseTracker/
+├── main.py           # CSV backend and original command-line functions
+├── gui.py            # Tkinter dashboard
+├── expenses.csv      # Persistent transaction data
+├── requirements.txt  # Pandas and Matplotlib dependencies
+├── README.md
+└── charts/           # Generated category and monthly PNG charts
+```
 
-## 9. Future improvements
+## Python concepts demonstrated
 
-- Allow transactions to be edited or deleted.
-- Add date-range filtering and monthly budgets.
-- Let the user choose from the suggested categories with a numbered list.
-- Export a report for a selected month.
+The project uses variables, input/output, conditional statements, loops, functions, lists, dictionaries, modular programming, exception handling, CSV reading/writing, and `datetime`. Pandas creates the monthly summary, and Matplotlib draws the charts.
+
+## Possible future improvements
+
+- Add editing and deletion for saved transactions.
+- Add date filters and user-defined monthly budgets.
+- Allow the user to export a monthly summary as a report.
+- Add more accessible keyboard navigation and chart descriptions.

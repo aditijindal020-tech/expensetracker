@@ -74,8 +74,10 @@ def save_transaction(transaction):
             if needs_header:
                 writer.writeheader()
             writer.writerow(transaction)
+        return True
     except OSError as error:
         print(f"Could not save the transaction: {error}")
+        return False
 
 
 def get_amount():
@@ -125,9 +127,9 @@ def add_income(transactions):
         "description": description,
         "amount": amount,
     }
-    save_transaction(transaction)
-    transactions.append(transaction)
-    print("Income saved successfully.")
+    if save_transaction(transaction):
+        transactions.append(transaction)
+        print("Income saved successfully.")
 
 
 def add_expense(transactions):
@@ -145,9 +147,9 @@ def add_expense(transactions):
         "description": description,
         "amount": amount,
     }
-    save_transaction(transaction)
-    transactions.append(transaction)
-    print("Expense saved successfully.")
+    if save_transaction(transaction):
+        transactions.append(transaction)
+        print("Expense saved successfully.")
 
 
 def view_transactions(transactions):
@@ -177,13 +179,22 @@ def view_transactions(transactions):
 
 def calculate_balance(transactions):
     """Display total income, expenses, and the remaining balance."""
+    totals = calculate_totals(transactions)
+    print("\nBalance Summary")
+    print(f"Total income:     ₹{totals['income']:.2f}")
+    print(f"Total expenses:   ₹{totals['expenses']:.2f}")
+    print(f"Remaining balance: ₹{totals['balance']:.2f}")
+
+
+def calculate_totals(transactions):
+    """Return income, expense, and balance totals for any interface to use."""
     total_income = sum(item["amount"] for item in transactions if item["type"] == "Income")
     total_expenses = sum(item["amount"] for item in transactions if item["type"] == "Expense")
-    balance = total_income - total_expenses
-    print("\nBalance Summary")
-    print(f"Total income:     ₹{total_income:.2f}")
-    print(f"Total expenses:   ₹{total_expenses:.2f}")
-    print(f"Remaining balance: ₹{balance:.2f}")
+    return {
+        "income": total_income,
+        "expenses": total_expenses,
+        "balance": total_income - total_expenses,
+    }
 
 
 def get_category_totals(transactions):
@@ -215,6 +226,15 @@ def monthly_summary(transactions):
     if not transactions:
         print("No transactions recorded yet.")
         return
+    summary = build_monthly_summary(transactions)
+    print(summary.to_string(formatters={column: "₹{:,.2f}".format for column in summary.columns}))
+
+
+def build_monthly_summary(transactions):
+    """Create the Pandas monthly income, expense, and balance table."""
+    columns = ["Income", "Expense", "Balance"]
+    if not transactions:
+        return pd.DataFrame(columns=columns)
     data_frame = pd.DataFrame(transactions)
     data_frame["date"] = pd.to_datetime(data_frame["date"], format=DATE_FORMAT)
     data_frame["month"] = data_frame["date"].dt.to_period("M")
@@ -225,9 +245,9 @@ def monthly_summary(transactions):
         if transaction_type not in summary.columns:
             summary[transaction_type] = 0.0
     summary["Balance"] = summary["Income"] - summary["Expense"]
-    summary = summary[["Income", "Expense", "Balance"]]
+    summary = summary[columns]
     summary.index = summary.index.astype(str)
-    print(summary.to_string(formatters={column: "₹{:,.2f}".format for column in summary.columns}))
+    return summary
 
 
 def generate_charts(transactions):
@@ -303,5 +323,12 @@ def main():
             print("Invalid choice. Please enter a number from 1 to 8.")
 
 
-if __name__ == "__main__":
+def cli_main():
+    """Run the original command-line menu when requested explicitly."""
     main()
+
+
+if __name__ == "__main__":
+    from gui import launch_gui
+
+    launch_gui()
